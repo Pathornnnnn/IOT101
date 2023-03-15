@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="th" xml:lang="th">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<h1><p>
+    LED = <span id="led-state">__</span></p>
+</h1>
+<button onclick="toggleLED()"> กดปุ่ม </button> 
+<br>
+  <h4>
+      การกดปุ่ม Toggle จะทำให้ไฟ LED ที่อยู่กับอุปกรณ์ <br>
+      NodeMcu ติดและดับจริงๆ 
+  </h4>
+</body>
+  
+<script> 
+var nextStat="?";
+var stat="";
+var reqStat="?";
+var id="button1_stat";
+var polling = setInterval(refleshDataNew, 800);
+
+function toggleLED()
+{
+  console.log("button was clicked!");
+  var xhr = new XMLHttpRequest();
+  var url = "button1_proc.php?id="+id+"&value="+reqStat;
+  xhr.responseType = 'text';
+
+  xhr.onreadystatechange = function() 
+  {
+    if (this.readyState == 4 && this.status == 200) 
+    {
+      stat = this.responseText;
+      if(stat=="> = ON")
+       {
+         nextStat="OFF";
+         stat="ON"
+       }
+      else if(stat=="> = OFF")
+       {
+         nextStat="ON";
+         stat="OFF"
+       } 
+     document.getElementById("led-state").innerHTML = stat; 
+     reqStat=nextStat; 
+   }
+ }
+  
+  xhr.open("GET", url, true);
+  xhr.send(); 
+}
+   
+function refleshDataNew()
+  {
+    reqStat="?"  ;
+    toggleLED();
+  }  
+ 
+document.addEventListener('DOMContentLoaded', toggleLED(), false); 
+</script>
+</html>
